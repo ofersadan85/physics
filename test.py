@@ -1,5 +1,8 @@
+import time
 import numpy as np
 import cv2 as cv
+
+from vector import Vector2d
 
 CANVAS_SIZE = (512, 512)
 WINDOW_NAME = "My Canvas"
@@ -25,6 +28,25 @@ cv.namedWindow(WINDOW_NAME, cv.WINDOW_AUTOSIZE)
 cv.setMouseCallback(WINDOW_NAME, mouse_handler)
 # cv.setWindowTitle(WINDOW_NAME, "My Canvas")
 # cv.getWindowProperty()
+
+    
+def clock():
+    center = [CANVAS_SIZE[0] // 2, CANVAS_SIZE[1] // 2]
+    seconds = Vector2d(0, 1) + center
+    seconds = seconds.with_magnitude(100)
+    minutes = Vector2d(0, 1) + center
+    minutes = minutes.with_magnitude(150)
+    while True:
+        canvas = np.zeros(CANVAS_SIZE, dtype=np.uint8)
+        seconds = seconds.rotate(6, radians=False)
+        minutes = minutes.rotate(0.1, radians=False)
+        cv.arrowedLine(canvas, center, (center + seconds).astype(int), (255, 0, 0), 1, cv.LINE_AA, 0, 0.1)
+        cv.arrowedLine(canvas, center, (center + minutes).astype(int), (255, 0, 0), 3, cv.LINE_AA, 0, 0.1)
+        cv.imshow(WINDOW_NAME, canvas)
+        time.sleep(1)
+        if cv.waitKey(1) == 27:
+            break
+
 
 
 def show_random():
