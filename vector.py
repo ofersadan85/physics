@@ -67,6 +67,11 @@ class Vector(np.ndarray):
         """Set the magnitude of the vector"""
         return self * (magnitude / self.magnitude())
 
+    @classmethod
+    def random(cls, dimensions: int) -> "Vector":
+        """Create a random vector with the given number of dimensions"""
+        return cls(np.random.rand(dimensions))
+
 
 class Vector2d(Vector):
     """A Vector2d class that extends Vector with some useful methods for 2 dimensional vectors."""
@@ -130,3 +135,7 @@ class Vector2d(Vector):
             [[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]
         )
         return rotation_matrix.dot(self).view(Vector2d)
+
+    @classmethod
+    def random(cls) -> "Vector2d":
+        return Vector.random(2).view(Vector2d)
