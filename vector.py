@@ -1,23 +1,10 @@
-import math
 from typing import Sequence
 
 import numpy as np
 
 # Shorthand variables
-PI = math.pi
-TAU = math.tau
-TWO_PI = TAU
+PI = np.pi
 RIGHT_ANGLE = PI / 2
-
-
-def radians(degrees: float) -> float:
-    """Convert degrees to radians"""
-    return degrees * PI / 180.0
-
-
-def degrees(radians: float) -> float:
-    """Convert radians to degrees"""
-    return radians * 180.0 / PI
 
 
 class Vector(np.ndarray):
@@ -61,21 +48,60 @@ class Vector(np.ndarray):
         """Normalize the vector v - Get the unit vector of v"""
         return self / self.magnitude(self)
 
-    def angle(self, other=None, radians: bool = True) -> float:
-        """Get the angle between this vector and another, or between this vector and the x-axis. Max angle is PI (180 degrees)"""
+    def angle(self, other=None, radians: bool = True, axis: int = 0) -> float:
+        """
+        Get the angle between this vector and another,
+        or between this vector and the axis.
+        Max angle is PI (180 degrees)
+        """
         if other is None:
             other = np.zeros(self.shape).view(Vector)
-            other[0] = 1.0
+            other[axis] = 1.0
         if not isinstance(other, Vector):
             other = Vector(other)
         result = np.arccos(self.dot(other) / (self.magnitude() * other.magnitude()))
         # result = np.arccos(np.dot(self, other) / (self.magnitude() * v2.magnitude()))
-        return result if radians else degrees(result)
+        return result if radians else np.rad2deg(result)
 
-    def set_magnitude(self, magnitude: float) -> "Vector":
+    def with_magnitude(self, magnitude: float) -> "Vector":
         """Set the magnitude of the vector"""
         return self * (magnitude / self.magnitude())
 
-    def set_angle(self, angle: float, radians: bool = True) -> "Vector":
-        """Set the angle of the vector"""  # TODO
-        return NotImplemented
+
+class Vector2d(Vector):
+    def __new__(cls, x: float = 0.0, y: float = 0.0):
+        """Create a new vector2d"""
+        return Vector.__new__(cls, [x, y])
+
+    def heading(self) -> float:
+        """Get the heading of the vector"""
+        return np.arctan2(self[1], self[0])
+
+    @property
+    def x(self) -> float:
+        """Get the x component of the vector"""
+        return self[0]
+
+    @x.setter
+    def x(self, value: float):
+        """Set the x component of the vector"""
+        self[0] = value
+
+    @property
+    def y(self) -> float:
+        """Get the y component of the vector"""
+        return self[1]
+
+    @y.setter
+    def y(self, value: float):
+        """Set the y component of the vector"""
+        self[1] = value
+
+    def rotate(self, angle: float, radians: bool = True) -> "Vector":
+        """Set the angle of the vector"""
+        if not radians:
+            angle = np.deg2rad(angle)
+        rotation_matrix = np.array(
+            [[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]
+        )
+        return rotation_matrix.dot(self).view(Vector2d)
