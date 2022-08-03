@@ -69,9 +69,34 @@ class Vector(np.ndarray):
 
 
 class Vector2d(Vector):
+    """A Vector2d class that extends Vector with some useful methods for 2 dimensional vectors."""
+
     def __new__(cls, x: float = 0.0, y: float = 0.0):
         """Create a new vector2d"""
         return Vector.__new__(cls, [x, y])
+
+    def __array_ufunc__(self, ufunc, method, *args, out=None, **kwargs):
+        """Try to keep the default behavior of numpy.ndarray for operations."""
+        args = [x.view(np.ndarray) if isinstance(x, Vector2d) else x for x in args]
+        if out:
+            outs = [x.view(np.ndarray) if isinstance(x, Vector2d) else x for x in out]
+            kwargs["out"] = tuple(outs)
+        else:
+            outs = (None,) * ufunc.nout
+
+        results = super().__array_ufunc__(ufunc, method, *args, **kwargs)
+        if results is NotImplemented:
+            return NotImplemented
+
+        if ufunc.nout == 1:
+            results = (results,)
+
+        results = tuple(
+            (np.asarray(result).view(Vector2d) if out is None else out)
+            for result, out in zip(results, outs)
+        )
+
+        return results[0] if len(results) == 1 else results
 
     def heading(self) -> float:
         """Get the heading of the vector"""
