@@ -140,7 +140,7 @@ class Vector2d(Vector):
 @dataclass
 class Thing:
     """A thing is any object with position and mass"""
-    
+
     mass: float = 1.0
     position: Vector = field(default_factory=Vector2d)
     velocity: Vector = field(default_factory=Vector2d)
@@ -148,11 +148,17 @@ class Thing:
     heading: float = 0.0
     angular_velocity: float = 0.0
     angular_acceleration: float = 0.0
+    locked: list[bool] = field(default_factory=list)
     uid: uuid.UUID = field(default_factory=uuid.uuid4)
 
     def __post_init__(self):
         self.mass = abs(self.mass)
         self.wrap_heading()
+        # Do not lock an axis if it is not specified
+        # self.locked needs to be a list with the same length as the number of position dimensions + 1
+        # so that self.locked[-1] represents the locked state of rotation "axis"
+        while len(self.locked) < len(self.position) + 1:
+            self.locked.append(False)
 
     def __hash__(self) -> int:
         return hash(self.uid)
@@ -167,14 +173,29 @@ class Thing:
     def update(self):
         """Update velocity, position and heading"""
         self.velocity += self.acceleration
+        for i, lock in enumerate(self.locked[:-1]):
+            if lock:
+                self.velocity[i] = 0.0
         self.position += self.velocity
+
         self.angular_velocity += self.angular_acceleration
+        if self.locked[-1]:
+            self.angular_velocity = 0.0
         self.heading += self.angular_velocity
         self.wrap_heading()
 
     def wrap_heading(self):
         """Wrap the heading to be -PI < heading <= PI"""
         self.heading = (self.heading + np.pi) % (2 * np.pi) - np.pi
+
+    def lock(self, axes: int | list[int] | None = None, unlock: bool = False):
+        """Lock the given axes by index, or all axes if axes is None. index of -1 locks rotation"""
+        if axes is None:
+            axes = range(-1, len(self.position))
+        if isinstance(axes, int):
+            axes = [axes]
+        for index in axes:
+            self.locked[index] = not unlock
 
     def bounce(self, axis: int = 0, ratio: float = 1.0) -> None:
         """
