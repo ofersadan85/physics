@@ -140,7 +140,7 @@ class Vector2d(Vector):
 @dataclass
 class Thing:
     """A thing is any object with position and mass"""
-
+    
     mass: float = 1.0
     position: Vector = field(default_factory=Vector2d)
     velocity: Vector = field(default_factory=Vector2d)
@@ -148,18 +148,17 @@ class Thing:
     heading: float = 0.0
     angular_velocity: float = 0.0
     angular_acceleration: float = 0.0
-    uuid: uuid.UUID = field(default_factory=uuid.uuid4)
+    uid: uuid.UUID = field(default_factory=uuid.uuid4)
 
     def __post_init__(self):
-        """Make sure that mass is positive, and heading wraps around"""
         self.mass = abs(self.mass)
         self.wrap_heading()
 
     def __hash__(self) -> int:
-        return hash(self.uuid)
+        return hash(self.uid)
 
     def __eq__(self, other) -> bool:
-        return isinstance(other, Thing) and self.uuid == other.uuid
+        return isinstance(other, Thing) and self.uid == other.uid
 
     def distance(self, other: "Thing") -> float:
         """Calculate the distance between two things"""
