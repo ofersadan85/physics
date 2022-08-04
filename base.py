@@ -176,12 +176,11 @@ class Thing:
         self.angular_velocity += self.angular_acceleration
         self.heading += self.angular_velocity
 
-    def bounce(self, x: bool = True, ratio: float = 1.0) -> None:
+    def bounce(self, axis: int = 0, ratio: float = 1.0) -> None:
         """
         Bounce off something in a given axis, with a given ratio velocity
         i.e. if ratio is 0.99, the velocity will be reversed and reduced by 1%
         """
-        axis = 0 if x else 1
         self.position[axis] = -self.position[axis] * ratio
 
     def flip(self) -> None:
