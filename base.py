@@ -3,10 +3,6 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-# Shorthand variables
-PI = np.pi
-RIGHT_ANGLE = PI / 2
-
 
 class Vector(np.ndarray):
     """A vector class that extends numpy.ndarray with some useful methods."""
@@ -155,8 +151,9 @@ class Thing:
     uuid: uuid.UUID = field(default_factory=uuid.uuid4)
 
     def __post_init__(self):
-        """Make sure that mass is positive"""
+        """Make sure that mass is positive, and heading wraps around"""
         self.mass = abs(self.mass)
+        self.wrap_heading()
 
     def __hash__(self) -> int:
         return hash(self.uuid)
@@ -174,6 +171,11 @@ class Thing:
         self.position += self.velocity
         self.angular_velocity += self.angular_acceleration
         self.heading += self.angular_velocity
+        self.wrap_heading()
+
+    def wrap_heading(self):
+        """Wrap the heading to be -PI < heading <= PI"""
+        self.heading = (self.heading + np.pi) % (2 * np.pi) - np.pi
 
     def bounce(self, axis: int = 0, ratio: float = 1.0) -> None:
         """
