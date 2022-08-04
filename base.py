@@ -144,10 +144,8 @@ class Thing:
     mass: float = 1.0
     position: Vector = field(default_factory=Vector2d)
     velocity: Vector = field(default_factory=Vector2d)
-    acceleration: Vector = field(default_factory=Vector2d)
     heading: float = 0.0
     angular_velocity: float = 0.0
-    angular_acceleration: float = 0.0
     locked: list[bool] = field(default_factory=list)
     uid: uuid.UUID = field(default_factory=uuid.uuid4)
 
@@ -171,14 +169,12 @@ class Thing:
         return np.linalg.norm(self.position - other.position)
 
     def update(self):
-        """Update velocity, position and heading"""
-        self.velocity += self.acceleration
+        """Update position and heading"""
         for i, lock in enumerate(self.locked[:-1]):
             if lock:
                 self.velocity[i] = 0.0
         self.position += self.velocity
 
-        self.angular_velocity += self.angular_acceleration
         if self.locked[-1]:
             self.angular_velocity = 0.0
         self.heading += self.angular_velocity
