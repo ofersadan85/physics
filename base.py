@@ -146,18 +146,17 @@ class Thing:
     """A thing is any object with position and mass"""
 
     mass: float = 1.0
-    position: Vector2d = field(default_factory=Vector2d)
-    velocity: Vector2d = field(default_factory=Vector2d)
-    acceleration: Vector2d = field(default_factory=Vector2d)
+    position: Vector = field(default_factory=Vector2d)
+    velocity: Vector = field(default_factory=Vector2d)
+    acceleration: Vector = field(default_factory=Vector2d)
     heading: float = 0.0
     angular_velocity: float = 0.0
     angular_acceleration: float = 0.0
     uuid: uuid.UUID = field(default_factory=uuid.uuid4)
 
     def __post_init__(self):
-        """Make sure the position is a vector and that mass is positive"""
+        """Make sure that mass is positive"""
         self.mass = abs(self.mass)
-        self.position = Vector2d(self.position)
 
     def __hash__(self) -> int:
         return hash(self.uuid)
