@@ -10,12 +10,11 @@ RIGHT_ANGLE = PI / 2
 class Vector(np.ndarray):
     """A vector class that extends numpy.ndarray with some useful methods."""
 
-    def __new__(cls, input_array: Sequence | None = None):
-        """Create a new vector. Raise an error if the input is not one dimensional."""
-        arr = np.array(input_array, dtype=np.float64)
-        if arr.ndim != 1:
-            raise ValueError("Vector must be 1-dimensional")
-        return np.array(input_array, dtype=np.float64).view(cls)
+    def __new__(cls, *args):
+        """Create a new vector from a sequence of numbers"""
+        if isinstance(args[0], cls):
+            args = args[0].tolist()
+        return np.array(args, dtype=float).view(cls)
 
     def __array_ufunc__(self, ufunc, method, *args, out=None, **kwargs):
         """Try to keep the default behavior of numpy.ndarray for operations."""
@@ -78,7 +77,7 @@ class Vector2d(Vector):
 
     def __new__(cls, x: float = 0.0, y: float = 0.0):
         """Create a new vector2d"""
-        return Vector.__new__(cls, [x, y])
+        return Vector.__new__(cls, x, y)
 
     def __array_ufunc__(self, ufunc, method, *args, out=None, **kwargs):
         """Try to keep the default behavior of numpy.ndarray for operations."""
