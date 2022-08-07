@@ -91,4 +91,3 @@ def test_rotations():
         rotated = v_random.rotate(angle)
         assert np.isclose(v_random.magnitude, rotated.magnitude)
         # TODO: Check that the angle is correct
-        
