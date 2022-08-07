@@ -155,3 +155,19 @@ def test_copy_inequality():
         assert t.mass == copy.mass
         assert t.heading == copy.heading
         assert t.angular_velocity == copy.angular_velocity
+
+
+def test_distance():
+    t = Thing(position=(3.0, 4.0))
+    a = Thing(position=(0.0, 4.0))
+    assert t.distance(a) == 3.0
+    assert t.distance(a) == a.distance(t)
+    b = Thing(position=(3.0, 0.0))
+    assert t.distance(b) == 4.0
+    assert a.distance(b) == 5.0
+    mover = Thing(position=(3.0, 4.0), velocity=(1.0, 1.0))
+    assert t.distance(mover) == 0.0
+    mover.update()
+    assert t.distance(mover) == np.sqrt(2)
+    mover.update()
+    assert t.distance(mover) == 2 * np.sqrt(2)
