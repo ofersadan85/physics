@@ -37,7 +37,7 @@ class Thing:  # Currently only used in 2D
 
     def update(self):
         """Update position"""
-        lock = [not(self.lock_x), not(self.lock_y)]
+        lock = [not self.lock_x, not self.lock_y]
         self.velocity = self.velocity * lock
         self.position = self.position + self.velocity
 
