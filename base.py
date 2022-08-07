@@ -127,24 +127,18 @@ class RotatingThing(Thing):
         )
 
 
+@dataclass
 class Spring:
     """A spring between two things"""
 
-    def __init__(
-        self,
-        thing_a: Thing,
-        thing_b: Thing,
-        spring_constant: float = 0.1,
-        rest_length: float = 1.0,
-    ):
-        self.a = thing_a
-        self.b = thing_b
-        self.spring_constant = spring_constant
-        self.rest_length = rest_length
+    a: Thing = field(default_factory=Thing)
+    b: Thing = field(default_factory=Thing)
+    k: float = 0.1
+    rest_length: float = 1.0
 
     def update(self):
         """Apply a spring force between the two things"""
         force = self.a.position - self.b.position  # Vector from b to a
-        force.magnitude = (self.rest_length - force.magnitude) * self.spring_constant
+        force.magnitude = (self.rest_length - force.magnitude) * self.k
         self.a.apply_force(-force)
         self.b.apply_force(force)
