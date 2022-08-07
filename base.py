@@ -1,30 +1,29 @@
 import uuid
 from dataclasses import dataclass, field
+from typing import Sequence
 
 import numpy as np
 
-from vectors import Vector, Vector2d, normalize_angle
+from vectors import Vector2d, normalize_angle
+
 
 @dataclass
-class Thing:
-    """A thing is any object with position and mass"""
+class Thing:  # Currently only used in 2D
+    """A thing is any object with changing position and mass"""
 
     mass: float = 1.0
-    position: Vector = field(default_factory=Vector2d)
-    velocity: Vector = field(default_factory=Vector2d)
-    heading: float = 0.0
-    angular_velocity: float = 0.0
-    locked: list[bool] = field(default_factory=list)
+    position: Sequence = field(default_factory=Vector2d)
+    velocity: Sequence = field(default_factory=Vector2d)
+    lock_x: bool = False
+    lock_y: bool = False
     uid: uuid.UUID = field(default_factory=uuid.uuid4)
 
     def __post_init__(self):
         self.mass = abs(self.mass)
-        self.heading = normalize_angle(self.heading)
-        # Do not lock an axis if it is not specified
-        # self.locked needs to be a list with the same length as the number of position dimensions + 1
-        # so that self.locked[-1] represents the locked state of rotation "axis"
-        while len(self.locked) < len(self.position) + 1:
-            self.locked.append(False)
+        if not isinstance(self.position, Vector2d):
+            self.position = Vector2d(*self.position)
+        if not isinstance(self.velocity, Vector2d):
+            self.velocity = Vector2d(*self.velocity)
 
     def __hash__(self) -> int:
         return hash(self.uid)
@@ -37,34 +36,34 @@ class Thing:
         return np.linalg.norm(self.position - other.position)
 
     def update(self):
-        """Update position and heading"""
-        for i, lock in enumerate(self.locked[:-1]):
-            if lock:
-                self.velocity[i] = 0.0
+        """Update position"""
+        self.velocity *= [self.lock_x, self.lock_y]
         self.position += self.velocity
-
-        if self.locked[-1]:
-            self.angular_velocity = 0.0
-        self.heading += self.angular_velocity
-        self.heading = normalize_angle(self.heading)
-
-    def lock(self, axes: int | list[int] | None = None, unlock: bool = False):
-        """Lock the given axes by index, or all axes if axes is None. index of -1 locks rotation"""
-        if axes is None:
-            axes = range(-1, len(self.position))
-        if isinstance(axes, int):
-            axes = [axes]
-        for index in axes:
-            self.locked[index] = not unlock
 
     def bounce(self, axis: int = 0, ratio: float = 1.0) -> None:
         """
         Bounce off something in a given axis, with a given ratio velocity
         i.e. if ratio is 0.99, the velocity will be reversed and reduced by 1%
         """
-        self.position[axis] = -self.position[axis] * ratio
+        self.velocity[axis] = -self.velocity[axis] * ratio
 
-    def flip(self) -> None:
-        """Flip the velocity and heading in all directions"""
-        self.velocity = -self.velocity
-        self.heading = -self.heading
+
+@dataclass
+class RotatingThing(Thing):
+    """A Thing object that has a heading and angular_velocity"""
+
+    heading: float = 0.0
+    angular_velocity: float = 0.0
+    lock_heading: bool = False
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.heading = normalize_angle(self.heading)
+
+    def update(self):
+        """Update position and heading"""
+        super().update()
+        if self.lock_heading:
+            self.angular_velocity = 0.0
+        self.heading += self.angular_velocity
+        self.heading = normalize_angle(self.heading)
