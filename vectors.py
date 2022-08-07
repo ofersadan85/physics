@@ -15,7 +15,7 @@ def normalize_angle(angle: float, radians: bool = True) -> float:
     return result if radians else np.rad2deg(result)
 
 
-def clockwise(angle: float, radians: bool = False) -> float:
+def clockwise_angle(angle: float, radians: bool = False) -> float:
     """Return the angle in the clockwise direction. Will always return an angle >= 0."""
     shift = np.pi if radians else 180
     return normalize_angle(angle, radians=radians) + shift

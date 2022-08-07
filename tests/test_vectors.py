@@ -1,7 +1,7 @@
 from itertools import product
 
 import numpy as np
-from vectors import Vector, Vector2d, normalize_angle, clockwise
+from vectors import Vector, Vector2d, clockwise_angle, normalize_angle
 
 
 def test_normalize_angle():
@@ -87,7 +87,7 @@ def test_rotations():
 
         # Test rotations by current tested angle for a random vector
         v_random = Vector2d.random()
-        angle = np.deg2rad(clockwise(angle))  # Clockwise rotation easier to test
+        angle = np.deg2rad(clockwise_angle(angle))  # Clockwise rotation easier to test
         rotated = v_random.rotate(angle)
         assert np.isclose(v_random.magnitude, rotated.magnitude)
         # TODO: Check that the angle is correct
