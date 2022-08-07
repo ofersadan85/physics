@@ -2,7 +2,7 @@ import time
 import numpy as np
 import cv2 as cv
 
-from vector import Vector2d
+from vectors import Vector2d
 
 CANVAS_SIZE = (512, 512)
 WINDOW_NAME = "My Canvas"
