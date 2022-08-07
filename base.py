@@ -31,6 +31,10 @@ class Thing:  # Currently only used in 2D
     def __eq__(self, other) -> bool:
         return isinstance(other, Thing) and self.uid == other.uid
 
+    def apply_force(self, force: Vector2d) -> None:
+        """Apply a force to the thing"""
+        self.velocity = self.velocity + force / self.mass
+
     def distance(self, other: "Thing") -> float:
         """Calculate the distance between two things"""
         return np.linalg.norm(self.position - other.position)
@@ -86,6 +90,10 @@ class RotatingThing(Thing):
     def __eq__(self, other) -> bool:
         return isinstance(other, Thing) and self.uid == other.uid
 
+    def apply_angular_force(self, force: float) -> None:
+        """Apply an angular force to the thing"""
+        self.angular_velocity += force / self.mass
+
     def update(self):
         """Update position and heading"""
         super().update()
@@ -117,3 +125,26 @@ class RotatingThing(Thing):
             heading=(np.random.rand() * 2 * np.pi),
             angular_velocity=np.random.rand(),
         )
+
+
+class Spring:
+    """A spring between two things"""
+
+    def __init__(
+        self,
+        thing_a: Thing,
+        thing_b: Thing,
+        spring_constant: float = 0.1,
+        rest_length: float = 1.0,
+    ):
+        self.a = thing_a
+        self.b = thing_b
+        self.spring_constant = spring_constant
+        self.rest_length = rest_length
+
+    def update(self):
+        """Apply a spring force between the two things"""
+        force = self.a.position - self.b.position  # Vector from b to a
+        force.magnitude = (self.rest_length - force.magnitude) * self.spring_constant
+        self.a.apply_force(-force)
+        self.b.apply_force(force)
