@@ -25,8 +25,10 @@ def mouse_handler(event, x, y, flags, param):
             t.lock_x = True
             t.lock_y = True
         if len(THINGS) > 0:
-            t.mass = THINGS[-1].mass + 1
-            s = Spring(t, np.random.choice(THINGS), k=0.001, rest_length=1.0)
+            t.mass = THINGS[-1].mass * 2
+            s = Spring(
+                t, np.random.choice(THINGS), k=0.001, rest_length=1.0, dampening=0.001
+            )
             springs.append(s)
         THINGS.append(t)
 
@@ -70,7 +72,7 @@ if __name__ == "__main__":
             cv.circle(
                 canvas,
                 t.position.astype(int),
-                int(t.mass),
+                int(np.sqrt(t.mass)),
                 (255, 255, 255),
                 -1,
                 cv.LINE_AA,
