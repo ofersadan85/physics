@@ -65,11 +65,13 @@ class Thing:  # Currently only used in 2D
     @classmethod
     def random(cls) -> "Thing":
         """Create a random thing"""
-        return Thing(
+        t = Thing(
             position=Vector2d.random(),
             velocity=Vector2d.random(),
             mass=np.random.rand(),
         )
+        t.velocity = t.velocity.rotate(np.random.rand() * np.pi * 2)
+        return t
 
 
 @dataclass
