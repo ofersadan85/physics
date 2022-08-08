@@ -138,7 +138,7 @@ class Spring:
 
     def update(self):
         """Apply a spring force between the two things"""
-        force = self.a.position - self.b.position  # Vector from b to a
+        force = self.a.position - self.b.position
         force.magnitude = (self.rest_length - force.magnitude) * self.k
-        self.a.apply_force(-force)
-        self.b.apply_force(force)
+        self.a.apply_force(force)
+        self.b.apply_force(-force)
