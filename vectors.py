@@ -61,8 +61,8 @@ class Vector(np.ndarray):
     @magnitude.setter
     def magnitude(self, magnitude: float):
         """Set the magnitude of the vector"""
-        magnitude_ratio = magnitude / self.magnitude
-        self *= magnitude_ratio
+        if self.magnitude > 0:
+            self *= magnitude / self.magnitude
 
     def unit(self) -> "Vector":
         """Normalize the vector"""
