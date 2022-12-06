@@ -135,7 +135,7 @@ class Spring:
 
     a: Thing = field(default_factory=Thing)
     b: Thing = field(default_factory=Thing)
-    k: float = 0.1  # spring constant
+    k: float = 0.01  # spring constant
     rest_length: float = 1.0
     dampening: float = 0.0
 
